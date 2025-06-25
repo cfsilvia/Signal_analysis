@@ -1,0 +1,9 @@
+#Annotation of the events
+'1':
+  data_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/BMR10_with_landmarks_left_ToPlot.xlsx
+  sheet_name: BM_snout_y
+  column_name: Left_side
+
+
+#select your choice
+choice: '1'
