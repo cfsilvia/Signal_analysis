@@ -1,4 +1,5 @@
 import yaml
+from Annotation_Events import Annotation_Events
 
 def main_menu(choice, data):
     match choice:
@@ -6,6 +7,9 @@ def main_menu(choice, data):
              file = data['1']['data_file']
              sheet_name = data['1']['sheet_name']
              column_name = data['1']['column_name']
+             output_file = data['1']['output_file']
+             annotation = Annotation_Events(file, sheet_name, column_name, output_file)
+             annotation()
          case _:
              return "Invalid option"
              
