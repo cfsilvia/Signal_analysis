@@ -17,7 +17,7 @@ class Plot_signal:
        self.fig, self.ax = plt.subplots(figsize = (15,4))
        self.ax.plot(self.signal, label = "Signal", color = "Blue")
        self.ax.set_xlabel("Frame")
-       self.ax.set_ylabel("Amplitude")
+       self.ax.set_ylabel("Signal")
        self.ax.grid(True)
        
     #===prepare a dictionary with the labels which define the beggining and last of each frame
