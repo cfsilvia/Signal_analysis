@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from tkinter import messagebox
+from matplotlib.patches import Patch
 
 class Annotation_Events:
    def __init__(self,file,sheet_name,column_name, output_file):
@@ -34,7 +36,7 @@ class Annotation_Events:
    def _init_plot(self):
        self.fig, self.ax = plt.subplots(figsize = (15,4))
        self.ax.plot(self.signal, label = "Signal", color = "Blue")
-       self.ax.set_title("Click twice to mark region. Press number key to label. 'd' to undo. 'x' to remove last line")      
+       self.ax.set_title("Click twice to mark region. Press number key to label. 'd' to undo. 'x' to remove last line." "k to save to excel")      
        self.ax.set_xlabel("Frame")
        self.ax.set_ylabel("Signal")
        self.ax.grid(True)
@@ -60,8 +62,11 @@ class Annotation_Events:
             self._delete_last_region()
         elif event.key == 'x':
             self._delete_last_line()
-     
-                  
+        elif event.key == 'k':
+             self._save_outputs()
+             self._save_motifs()
+             messagebox.showinfo(title="save", message = "The labels/motifs were saved")
+                     
     #===label last region and print===
    def _label_last_region(self, label):
         cmap1 = ['white','red', 'green','blue','magenta','cyan','yellow','brown']
@@ -138,6 +143,19 @@ class Annotation_Events:
        data.to_excel(writer, index = False)
           
    def __call__(self):
+      legend_elems = [
+      Patch(facecolor='white', edgecolor='k', alpha=0.3, label='0'),
+      Patch(facecolor='red',   edgecolor='k', alpha=0.3, label='1'),
+      Patch(facecolor='green',   edgecolor='k', alpha=0.3, label='2'),
+      Patch(facecolor='blue',   edgecolor='k', alpha=0.3, label='3'),
+      Patch(facecolor='magenta',   edgecolor='k', alpha=0.3, label='4'),
+      Patch(facecolor='cyan',   edgecolor='k', alpha=0.3, label='5'),
+      Patch(facecolor='yellow',   edgecolor='k', alpha=0.3, label='6'),
+      Patch(facecolor='brown',   edgecolor='k', alpha=0.3, label='7')
+      ]
+      
+      self.ax.legend(handles=legend_elems, loc='upper right')
+
       plt.tight_layout()
       plt.show()
       self._save_outputs()
