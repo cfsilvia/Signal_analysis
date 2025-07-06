@@ -7,3 +7,11 @@ def interpolation_signal(filename):
     labels = df["Labels"].values.astype(int)
     
     return signal, labels
+
+
+def interpolation_original_signal(data_file,sheet_name,column_name):
+    df = pd.read_excel(data_file, sheet_name = sheet_name)
+    
+    signal = df[column_name].interpolate().fillna(method="bfill").fillna(method="ffill").values
+    
+    return signal

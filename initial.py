@@ -3,7 +3,7 @@ from Annotation_Events import Annotation_Events
 import tkinter as tk
 from tkinter import filedialog
 import Proccesing_signal
-from Train_with_tweety import Train_with_tweety 
+from Train_with_tweety import Train_with_tweety, Validate_with_tweety, Find_motifs_with_tweety
 from Plot_signal import Plot_signal
 
 def main_menu(choice, data):
@@ -28,6 +28,23 @@ def main_menu(choice, data):
              file_labels = data['3']['file_labels']
              plotting = Plot_signal(file, sheet_name, column_name, file_labels,output_file)
              plotting._mark_labels()
+         case '4': #model validation
+             validation_file = data['4']['validation_file']
+             sheet_name = data['4']['sheet_name']
+             column_name = data['4']['column_name']
+             output_file = data['4']['output_file']
+             model_file=  data['4']['model_path']
+             signal, labels = Proccesing_signal.interpolation_signal(validation_file)
+             Validate_with_tweety(signal, labels, model_file, output_file)
+         case '5': #checking the model in new data
+             data_file = data['5']['data_file']
+             sheet_name = data['5']['sheet_name']
+             column_name = data['5']['column_name']
+             output_file = data['5']['output_file']
+             model_file=  data['5']['model_path']
+             signal = Proccesing_signal.interpolation_original_signal(data_file,sheet_name,column_name)
+             Find_motifs_with_tweety(signal, model_file, output_file)
+         
          case _:
              return "Invalid option"
              

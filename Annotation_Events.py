@@ -13,7 +13,7 @@ class Annotation_Events:
         df = pd.read_excel(file, sheet_name = sheet_name)
         self.signal = df[column_name].values
         self.output_file = output_file
-        if os.path.exists(self.output_file):
+        if os.path.exists(self.output_file + "labels.xlsx"):
             # load prior labels
             old = pd.read_excel(self.output_file + "labels.xlsx")
             self.labels = old['Labels'].values

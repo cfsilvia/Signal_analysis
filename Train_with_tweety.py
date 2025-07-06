@@ -5,6 +5,8 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, precision_score
+from sklearn.metrics import classification_report, confusion_matrix
+
 
 # ==== Dataset Loader divide in windows====
 class SignalDataset(Dataset):
@@ -81,9 +83,43 @@ def train(model, dataloader, criterion, optimizer, device, epochs=10):
               f"Acc: {epoch_acc:.4f} | "
               f"Prec: {epoch_prec:.4f}")
 
+#==============Prediction==========
+def Prediction(model, dataloader, device):
+    all_preds, all_labels = [], []
+    with torch.no_grad():
+        for x, y in dataloader:
+            x = x.to(device)
+            out = model(x)                           # (B, T/4, C)
+            preds = out.argmax(dim=2).cpu().numpy().ravel()
+            # downsample labels to match T/4
+            y_ds = y[:, ::4].numpy().ravel()
+            all_preds.extend(preds)
+            all_labels.extend(y_ds)
+            
+        # 5) Print classification report
+        print("=== Classification Report on Validation Set ===")
+        print(classification_report(all_labels, all_preds, zero_division=0))
 
+        # 6) Confusion matrix
+        cm = confusion_matrix(all_labels, all_preds)
+        print("=== Confusion Matrix ===")
+        print(cm)
 
-#====Main Runner====
+#================Inference helper=================================
+def predict_downsampled(model, signal, window_size=256, stride=64, device="cpu"):
+    model.eval()
+    preds = []
+    with torch.no_grad():
+        for start in range(0, len(signal) - window_size + 1, stride):
+            win = signal[start:start+window_size]
+            t = torch.from_numpy(win.astype(np.float32))[None, None,:].to(device)
+            out = model(t)
+            y = out.argmax(dim=-1).squeeze(0)
+            preds.append(y.cpu().numpy())
+    return np.concatenate(preds, axis = 0)        
+        
+
+#====Main Runner train====
 def Train_with_tweety(signal, labels,output_file):
     dataset = SignalDataset(signal, labels, window_size=256, stride=64) #create object
     dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
@@ -95,3 +131,39 @@ def Train_with_tweety(signal, labels,output_file):
     train(model, dataloader, criterion, optimizer, device, epochs=100)
     torch.save(model.state_dict(), output_file + "tweetynet1d_model.pth")
     print("Model saved to tweetynet1d_model.pth")
+    
+#=====Main Runner model with the validation set============
+def Validate_with_tweety(signal, labels, model_file, output_file):
+    #Build dataset
+    dataset = SignalDataset(signal, labels, window_size=256, stride=64) #create object
+    dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
+    #Instantiate model and load weights
+    num_classes = int(labels.max()) + 1
+    model = TweetyNet1D(input_channels=1, n_classes=num_classes)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.load_state_dict(torch.load(model_file, map_location=device))
+    model.to(device)
+    model.eval()
+    # 4) Run inference and collect predictions
+    Prediction(model, dataloader, device)
+    
+#===============Main runner check model with new data=========
+def Find_motifs_with_tweety(signal, model_file, output_file):
+    #Parameters
+    window_size = 256
+    stride = 64
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    #load saved state and infer n_classes
+    state = torch.load(model_file, map_location=device)
+    n_classes = state["classifier.weight"].shape[0]
+    
+    #Build model and load weights
+    model = TweetyNet1D(input_channels=1, hidden_size=128, n_classes=n_classes)
+    model.load_state_dict(state)
+    model.to(device)
+    
+    #Run inference
+    labels_predicted = predict_downsampled(model, signal,window_size=window_size, stride=stride, device=device)
+    
+    a=1
+    

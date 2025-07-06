@@ -15,8 +15,23 @@
   data_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/BMR10_with_landmarks_left_ToPlot.xlsx
   sheet_name: BM_snout_y
   column_name: Left_side
-  file_labels: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/labels_6700 events.xlsx
+  file_labels: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/labels events.xlsx
   output_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/
 
+#Validate the model
+'4':
+   validation_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/labels_6700 events.xlsx
+   sheet_name: BM_snout_y
+   column_name: Left_side
+   output_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/
+   model_path: F:/SilviaData/ScriptOnGithub/Signal_analysis/tweetynet1d_model.pth
+
+#Find motifs with the build model- input only the signal without labels
+'5':
+  data_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/BMR10_to_test.xlsx
+  sheet_name: BM_snout_y
+  column_name: Left_side
+  output_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/
+  model_path: F:/SilviaData/ScriptOnGithub/Signal_analysis/tweetynet1d_model.pth
 #select your choice
-choice: '1'
+choice: '5'
