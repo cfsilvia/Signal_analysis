@@ -106,18 +106,36 @@ def Prediction(model, dataloader, device):
         print(cm)
 
 #================Inference helper=================================
-def predict_downsampled(model, signal, window_size=256, stride=64, device="cpu"):
-    model.eval()
-    preds = []
-    with torch.no_grad():
-        for start in range(0, len(signal) - window_size + 1, stride):
-            win = signal[start:start+window_size]
-            t = torch.from_numpy(win.astype(np.float32))[None, None,:].to(device)
-            out = model(t)
-            y = out.argmax(dim=-1).squeeze(0)
-            preds.append(y.cpu().numpy())
-    return np.concatenate(preds, axis = 0)        
-        
+def predict_per_sample(model, signal, window_size, stride, device):
+   model.eval()
+   N = len(signal)
+   n_classes = model.classifier.out_features
+   pool_factor = 4
+   
+   #do list of windows starts
+   starts = list(range(0, N-window_size + 1, stride))
+   if starts[-1] != N - window_size:
+       starts.append(N - window_size)
+    # 2) accumulator for votes: counts[i, c] = number of windows that assigned class c to sample i
+   counts = np.zeros((N, n_classes), dtype=np.int32)
+   #run inference per window
+   with torch.no_grad():
+       for s in starts:
+           win = signal[s:s + window_size].astype(np.float32)   
+           x = (torch.from_numpy(win).unsqueeze(0).unsqueeze(0).to(device))
+           out = model(x)
+           labels_ds = out.argmax(-1)[0].cpu().numpy()
+            # 4) distribute each downsampled label back to its pool_factor-sized block
+           for j, lab in enumerate(labels_ds):
+                # the original samples covered by this downsampled index
+                start_idx = s + j * pool_factor
+                end_idx   = start_idx + pool_factor
+                counts[start_idx:end_idx, lab] += 1
+                
+    # 5) for each sample take the majority-vote label
+   labels_per_sample = counts.argmax(axis=1)
+
+   return labels_per_sample
 
 #====Main Runner train====
 def Train_with_tweety(signal, labels,output_file):
@@ -163,7 +181,12 @@ def Find_motifs_with_tweety(signal, model_file, output_file):
     model.to(device)
     
     #Run inference
-    labels_predicted = predict_downsampled(model, signal,window_size=window_size, stride=stride, device=device)
+    labels_predicted = predict_per_sample(model, signal, window_size, stride, device)
     
+    # 2. Build a DataFrame
+    df_out = pd.DataFrame({"Frame": np.arange(len(signal)), "Signal": signal, "Labels": labels_predicted})
+
+# 3. Save to Excel
+    df_out.to_excel(output_file + "predictions.xlsx", index=False)
     a=1
     

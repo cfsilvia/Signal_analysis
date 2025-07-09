@@ -71,6 +71,7 @@ class Annotation_Events:
    def _label_last_region(self, label):
         cmap1 = ['white','red', 'green','blue','magenta','cyan','yellow','brown']
         start, end = sorted(self.clicks[-2:])
+        end = end + 1 #ADDITION 9 JULY 2025
         self.labels[start:end] = label
         self.motif_regions.append((start, end, label))
         span = self.ax.axvspan(start, end, color = cmap1[label], alpha=0.3)

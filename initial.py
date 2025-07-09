@@ -44,7 +44,16 @@ def main_menu(choice, data):
              model_file=  data['5']['model_path']
              signal = Proccesing_signal.interpolation_original_signal(data_file,sheet_name,column_name)
              Find_motifs_with_tweety(signal, model_file, output_file)
-         
+         case '6':
+              data_file = data['6']['data_file']
+              sheet_name = data['6']['sheet_name']
+              column_name = data['6']['column_name']
+              output_file = data['6']['output_file']
+              old_labels_file = data['6']['old_labels_file']
+              sheet_name_old = data['6']['sheet_name_old_labels']
+              label = data['6']['label']
+              Proccesing_signal.get_labels(data_file, sheet_name, column_name, output_file,old_labels_file, sheet_name_old, label)
+              
          case _:
              return "Invalid option"
              

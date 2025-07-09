@@ -12,10 +12,10 @@
 
 #Plot the labels
 '3': 
-  data_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/BMR10_with_landmarks_left_ToPlot.xlsx
+  data_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/BMR10_to_test.xlsx
   sheet_name: BM_snout_y
   column_name: Left_side
-  file_labels: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/labels events.xlsx
+  file_labels: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/predictions.xlsx
   output_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/
 
 #Validate the model
@@ -33,5 +33,18 @@
   column_name: Left_side
   output_file: F:/BlindMole_tracking_Juna/2025/BMR10/BMR10/output/
   model_path: F:/SilviaData/ScriptOnGithub/Signal_analysis/tweetynet1d_model.pth
+
+#Create a table of labels
+ '6' :
+  data_file: U:/Users/Ruthi/2025/BMR2/BMR2_with_landmarks_left_ToPlot.xlsx
+  sheet_name: BM_snout_y
+  column_name: Left_side
+  output_file: U:/Users/Ruthi/2025/BMR2/
+  old_labels_file: U:/Users/Ruthi/head_drumming_S.xlsx
+  sheet_name_old_labels: BMR2
+  label: 1
+
+
+
 #select your choice
-choice: '5'
+choice: '2'
